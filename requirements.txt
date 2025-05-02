@@ -1,0 +1,11 @@
+streamlit
+crewai
+crewai-tools
+python-pptx
+python-dotenv  # For local development secrets
+langchain-groq # If using Groq
+langchain-google-genai # If using Gemini
+langchain-openai # If using OpenAI
+google-api-python-client # Needed for Gemini sometimes
+protobuf # Often needed alongside Google libraries
+litellm

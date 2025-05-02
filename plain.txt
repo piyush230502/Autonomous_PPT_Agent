@@ -1,0 +1,57 @@
+.
+├── .streamlit/
+│   └── secrets.toml  # Store API keys securely for deployment
+├── app.py            # Main Streamlit application code
+├── requirements.txt  # Python dependencies
+└── README.md         # Instructions (optional but recommended)
+
+
+
+#### PROJECT EXPLAINATION
+
+
+1.UI (Streamlit): Sets up a title, text input for the topic, a sidebar for selecting the 
+LLM and entering API keys, and a button to trigger generation.
+
+2.API Key Handling: Uses st.secrets (for deployment) and os.environ (with python-dotenv for
+ local .env files) to securely manage keys. It also includes st.text_input(type="password") 
+ as a fallback if keys aren't found elsewhere (less secure, mainly for quick local tests).
+
+3.LLM Selection: The get_llm function initializes the correct LangChain LLM wrapper based 
+on the user's choice.
+
+4.CrewAI Setup:
+-- Defines three agents: Researcher (uses SerperDevTool), Outliner, and Writer.
+-- Defines three sequential tasks: Research -> Outline -> Write Content.
+-- The content_task specifically instructs the Writer agent on the desired output format
+ (SLIDE: Title \n - Point 1...) to make parsing easier.
+-- The Crew is configured to run these tasks sequentially.
+
+5. Parsing: The parse_crew_output function uses regular expressions (re.split) to break 
+the raw text output from the final CrewAI task into a list of dictionaries, where each 
+dictionary represents a slide with a title and content (list of bullet points). This parsing
+ is crucial and might need adjustments based on how consistently the LLM follows the 
+ formatting instructions.
+
+6. PPT Generation (create_ppt): Uses the python-pptx library to create a new presentation, 
+add a title slide, and then iterate through the parsed_slides data, adding a "Title and
+ Content" slide for each item and populating the title and bullet points.
+
+7. Download: The generated presentation is saved to an in-memory BytesIO object, which is 
+then passed to st.download_button for the user.
+
+8. Error Handling: Basic try...except blocks are included for LLM initialization, CrewAI 
+execution, and PPT generation. Status messages (st.spinner, st.info, st.success, st.warning,
+ st.error) provide feedback to the user.
+
+9. Web Search Tool: CrewAI agents need to research.
+1.SerperDevTool: Provides Google Search results. Has a free tier (e.g., 2500 queries). 
+Requires API key.
+2.DuckDuckGoSearchRun: Completely free, no API key needed. Might be less comprehensive than
+ Google Search via Serper.
+3.Decision: We'll use SerperDevTool as it's common in CrewAI examples and the free tier is
+ usually sufficient for moderate use. We'll require a SERPER_API_KEY.
+
+This application provides a functional starting point for automated PPT generation using
+ free tools and services where possible. Remember that the quality of the output heavily 
+ depends on the chosen LLM and the clarity of the instructions given to the CrewAI agents
